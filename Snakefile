@@ -1,12 +1,3 @@
-
-
-
-
-
-
-
-
-
 temp_loc = "/scratch1/ley015"
 
 sample = ["CA73YANXX_8_161220_BPO--000_Other_TAAGGCGA-CTCTCTAT_R_161128_SHADIL_LIB2500_M002_R1",
