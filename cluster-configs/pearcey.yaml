@@ -1,0 +1,3 @@
+__default__ :
+        mail-type       : ALL
+        mail-user       : {csiro_ident}@csiro.au
