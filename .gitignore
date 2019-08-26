@@ -1,5 +1,6 @@
-*fastq.gz
-*.svg
-*.zip
-*.html
-.snakemake
+.Rhistory
+.snakemake/
+dag.svg
+reports/
+test_data/
+
