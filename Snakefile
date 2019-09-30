@@ -1,7 +1,19 @@
+#!/bin/bash
+
+#SBATCH --job-name=snakemake
+#SBATCH --time=24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem=60GB
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=ley015@csiro.au
+
+
+
 # To run:
-# run in sinteractive
+# run in sinteractive -c6 -m60g
 # module load miniconda3/4.3.24
-# snakemake -j 4               (-j flag runs script on multiple cores)
+# snakemake -j 6               (-j flag runs script on multiple cores)
 
 # To dryrun:
 # module load miniconda3/4.3.24
@@ -66,7 +78,7 @@ rule trim:
         java -jar {trim_path} PE -phred33 \
         {input.forward} {input.reverse} \
         {output.forward_paired} {output.forward_unpaired} {output.reverse_paired} {output.reverse_unpaired} \
-        -trimlog {sample}.log \
+        -trimlog {temp_loc}/reports/trimmed_reads/{sample}.log \
         LEADING:3 \
         TRAILING:3 \
         ILLUMINACLIP:TrueSeq3-PE.fa:2:30:10
@@ -97,8 +109,11 @@ rule trinity_align:
         fa = expand("{temp_loc}/reports/trimmed_reads/RSEM_trinity/Trinity.fasta", temp_loc = temp_loc),
     shell:
         """
-         Trinity --seqType fq --max_memory 50G --left {input.left} --right {input.right} --output /scratch1/ley015/reports/trimmed_reads/RSEM_trinity --CPU 6
+        module load trinity/2.3.2
+        Trinity --seqType fq --max_memory 50G --left {input.left} --right {input.right} --output /scratch1/ley015/reports/trimmed_reads/RSEM_trinity --CPU 6
+        module unload trinity/2.3.2
         """
+
         # """
         # /apps/trinity/2.3.2/util/align_and_estimate_abundance.pl --thread_count 16 --transcripts /OSM/CBR/AF/OZ_WHEAT/work/ref_seq/161010_Chinese_Spring_v1.0_pseudomolecules.fasta --seqType fq \
         # --left {input.left} --right {input.right} \
