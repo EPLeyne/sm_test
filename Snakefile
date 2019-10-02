@@ -92,7 +92,7 @@ rule fastqc_trimmed:
         zip2 = "{temp_loc}/reports/trimmed_reads/qc/{sample}_{id}{pu}_fastqc.zip",
         html2 = "{temp_loc}/reports/trimmed_reads/qc/{sample}_{id}{pu}_fastqc.html",
     threads:
-        32
+        4
     shell:
         """
         module load fastqc/0.11.8
