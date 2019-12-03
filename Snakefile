@@ -1,19 +1,6 @@
-#!/bin/bash
-
-#SBATCH --job-name=snakemake
-#SBATCH --time=24:00:00
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --mem=60GB
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=ley015@csiro.au
-
-
-
 # To run:
-# run in sinteractive -c6 -m60g
 # module load miniconda3/4.3.24
-# snakemake -j 6               (-j flag runs script on multiple cores)
+# snakemake -j 999 --cluster-config cluster-configs/pearcey.json --cluster 'sbatch --job-name {cluster.job-name} --ntasks-per-node {cluster.ntasks-per-node} --cpus-per-task {cluster.cpus-per-task} --time {cluster.time} --mail-user {cluster.mail-user} --mail-type {cluster.mail-type}'
 
 # To dryrun:
 # module load miniconda3/4.3.24
@@ -39,11 +26,18 @@ trim_path = '/apps/trimmomatic/0.38/trimmomatic-0.38.jar'
 
 rule all:
     input:
-        expand("{temp_loc}/reports/trimmed_reads/qc/{sample}_{id}{pu}_fastqc.zip", temp_loc = temp_loc, sample = sample, id = IDS, pu = PUs),
-        expand("{temp_loc}/reports/trimmed_reads/qc/{sample}_{id}{pu}_fastqc.html", temp_loc = temp_loc, sample = sample, id = IDS, pu = PUs),
         expand("{temp_loc}/reports/raw_reads/qc/{sample}_R{id}_fastqc.zip", sample = sample, temp_loc = temp_loc, id = IDS),
         expand("{temp_loc}/reports/raw_reads/qc/{sample}_R{id}_fastqc.html", sample = sample, temp_loc = temp_loc, id = IDS),
-        expand("{temp_loc}/reports/trimmed_reads/RSEM_trinity/Trinity.fasta", temp_loc = temp_loc, sample = sample),
+        expand("{temp_loc}/reports/trimmed_reads/qc/{sample}_{id}{pu}_fastqc.zip", temp_loc = temp_loc, sample = sample, id = IDS, pu = PUs),
+        expand("{temp_loc}/reports/trimmed_reads/qc/{sample}_{id}{pu}_fastqc.html", temp_loc = temp_loc, sample = sample, id = IDS, pu = PUs),
+        expand("{temp_loc}/reports/trimmed_reads/RSEM_trinity/{sample}/Trinity.fasta", temp_loc = temp_loc, sample = sample),
+
+# rule clean:
+#    shell:
+#       """
+#       rm -rf blahblahblah
+#       """     
+
 
 rule fastqc_raw:
     input:
@@ -106,7 +100,7 @@ rule trinity_align:
         left = expand("{temp_loc}/reports/trimmed_reads/{sample}_1P.fq.gz", temp_loc = temp_loc, sample = sample),
         right = expand("{temp_loc}/reports/trimmed_reads/{sample}_2P.fq.gz", temp_loc = temp_loc, sample = sample),
     output:
-        fa = expand("{temp_loc}/reports/trimmed_reads/RSEM_trinity/Trinity.fasta", temp_loc = temp_loc),
+        fa = expand("{temp_loc}/reports/trimmed_reads/RSEM_trinity/{sample}/Trinity.fasta", temp_loc = temp_loc, sample = sample),
     shell:
         """
         module load trinity/2.3.2
